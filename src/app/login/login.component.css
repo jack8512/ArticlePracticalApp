@@ -1,0 +1,100 @@
+.username-input, .email-input,  .password-input{
+  margin: 0px 40px;
+  width: 252px;
+  height: 20px;
+  padding: 9px 0px 7px 8px;
+  font-size: 15px;
+  background-color: #e6e6e6c8;
+  border: 0px;
+  border-radius: 5px;
+  align-items: center;
+}
+
+.flex-container{
+  display: inline-flex;
+  flex-direction: row;
+}
+
+.font-icon{
+  width: 175px;
+  height: auto;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.font-icon img {
+  width: 100%;
+  height: auto;
+}
+
+.login-toggle {
+  margin: 0 auto;
+  width: 200px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(0, 123, 252, 0.4);
+}
+
+.toggle-option {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.toggle-option.active {
+  background-color: rgba(0, 123, 252, 1);
+  border-radius: 5px;
+}
+
+#toggle-username, #toggle-email{
+display: none;
+}
+
+.input-container{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.alert{
+margin: 8px auto;
+color: red;
+font-size: 13px;
+}
+
+
+.submit-btn{
+  margin: 8px 40px;
+  width: 260px;
+  height: 32px;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+  border: 0px;
+  border-radius: 5px;
+  background-color: rgba(0, 123, 252, 1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  }
+
+  .submit-btn:disabled {
+    cursor: not-allowed;
+  }
+
+  .submit-btn.inputCorrect {
+    background-color: rgba(0, 123, 252, 0.4);
+  }
+.inputCorrect{
+  background-color: rgba(0, 123, 252, 0.4);
+}
