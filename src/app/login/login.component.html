@@ -27,11 +27,25 @@
         <input placeholder="密碼" type="password" formControlName="password" class="password-input" id="password">
       </div>
       <div *ngIf="hasErrors()" class="alert">
-        <div *ngFor="let field of ['username', 'email', 'password']">
+          <!-- <div *ngFor="let field of ['username', 'email', 'password']">
             <div *ngFor="let error of getErrors(field)">
               {{ error }}
             </div>
-        </div>
+          </div> -->
+           <!-- 顯示表單級別的錯誤 -->
+  <div *ngIf="invalidForm.touched && invalidForm.errors?.['atLeastOneRequired']">
+    <div *ngFor="let error of getErrors('form')">
+      {{ error }}
+    </div>
+  </div>
+  <!-- 顯示欄位級別的錯誤 -->
+  <div *ngFor="let field of ['username', 'email', 'password']">
+    <div *ngIf="invalidForm.get(field)?.touched && invalidForm.get(field)?.invalid">
+      <div *ngFor="let error of getErrors(field)">
+        {{ error }}
+      </div>
+    </div>
+  </div>
       </div>
       <!-- {{isSubmitDisabled}} -->
       <div><button type="submit" class="submit-btn" [disabled]="isSubmitDisabled" [class.inputCorrect]="inputValueIncorrect">登入</button></div>

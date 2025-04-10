@@ -1,3 +1,11 @@
+.flex-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
 .username-input, .email-input,  .password-input{
   margin: 0px 40px;
   width: 252px;
@@ -8,11 +16,6 @@
   border: 0px;
   border-radius: 5px;
   align-items: center;
-}
-
-.flex-container{
-  display: inline-flex;
-  flex-direction: row;
 }
 
 .font-icon{
