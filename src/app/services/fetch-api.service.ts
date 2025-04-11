@@ -13,7 +13,7 @@ export class FetchAPIService {
   constructor(private http: HttpClient){}
 
   login(payload: any): Observable<HttpResponse<ApiResponse>>{
-    return this.http.post<ApiResponse>(`${this.url}`,payload,{
+    return this.http.post<ApiResponse>(`${this.url}/users/login`,payload,{
       observe:'response'
     })
   }

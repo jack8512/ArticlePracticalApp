@@ -60,7 +60,7 @@ getErrors(controlName: string){
     this.errorMessage.push(`* 請輸入用戶名稱或電子郵件`);
   }
   if(errors?.['required']){
-    this.errorMessage.push(`* ${controlName} 是必須的`)
+    this.errorMessage.push(`* ${controlName} 為必填項目`)
   }if(errors?.['minlength']){
     this.errorMessage.push(`* ${controlName} 必須至少包含 5 個字符`)
   }if(errors?.['maxlength']){
@@ -92,26 +92,18 @@ onSubmit(){
       next:(res:HttpResponse<ApiResponse>)=>{
         if(res.status===200){
           this.invalidForm.patchValue({
+            username:'',
+            email:'',
             password:''
           })
-        }else{
-          this.errorMessage=res.body?.message || '未知錯誤'
-      }
+          //彈窗
+          alert(res.body?.message)
+        }
       },
       error:(err)=>{
-        this.errorMessage=err.error || '未知錯誤'
+        alert(err.error?.message || '未知錯誤')
       }
     })
-    // this.fetchAPIService.getUser().subscribe({
-    //   next:(res: HttpResponse<ApiResponse>)=>{
-    //     console.log('HTTP Status:', res.status)
-    //     if(res.status===200){
-    //       this.invalidForm.patchValue({
-    //         password:''
-    //       })
-    //     }
-    //   }
-    // })
 }
 
 }

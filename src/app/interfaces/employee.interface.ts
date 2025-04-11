@@ -13,6 +13,8 @@ export interface Employee {
   experience: number;
   is_married: boolean;
   updated_at: string;
+  username: string;
+  password: string;
 }
 
 export interface ApiResponse {
