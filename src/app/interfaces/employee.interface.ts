@@ -2,10 +2,10 @@ export interface Employee {
   last_name: string;
   phone: string;
   first_name: string;
-  birth_date: string;  // 可以根據需求使用 Date 類型
+  birth_date: string;
   salary: number;
   department: string;
-  created_at: string;  // 如果需要處理日期，可以考慮使用 Date 類型
+  created_at: string;
   email: string;
   id: number;
   address: string;
@@ -18,6 +18,6 @@ export interface Employee {
 }
 
 export interface ApiResponse {
-  employees: Employee[];
+  employees: Employee;
   message?: any;
 }

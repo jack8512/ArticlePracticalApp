@@ -2,10 +2,10 @@ import { FetchAPIService } from './../services/fetch-api.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { debounceTime, map } from 'rxjs';
+import { debounceTime, map, catchError, throwError } from 'rxjs';
 import { atLeastOneRequiredValidator, specialCharValidator } from '../shared/validators/special-validators';
 import { ApiResponse } from '../interfaces/employee.interface';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -17,46 +17,44 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class LoginComponent {
 
-invalidForm!: FormGroup;
-inputValueIncorrect: true | false =true
+loginForm!: FormGroup;
 errorMessage: string[]=[]
 
 constructor(private formBuilder: FormBuilder, private fetchAPIService:FetchAPIService){}
 
 get loginMethod() {
-  return this.invalidForm.get('loginMethod')?.value;
+  return this.loginForm.get('loginMethod')?.value;
 }
 
 ngOnInit():void{
   //valueChanges為observable可設定pipe
-  this.invalidForm = this.formBuilder.group({
+  this.loginForm = this.formBuilder.group({
     loginMethod: ['username'],
     username: ['', [Validators.minLength(5), Validators.maxLength(20)]],
     email: ['',  Validators.email],
     password: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20),specialCharValidator()]]
-  },{validators: [atLeastOneRequiredValidator()]}
+},{validators: [atLeastOneRequiredValidator()]}
 );
 
-  this.invalidForm.valueChanges.pipe(
+  this.loginForm.valueChanges.pipe(
     debounceTime(500)
   ).subscribe(() => {
-    if(!this.invalidForm.touched){
-      this.invalidForm.markAsTouched()
+    if(!this.loginForm.touched){
+      this.loginForm.markAsTouched()
     }
-    this.inputValueIncorrect = this.invalidForm.invalid;
   });
 }
 
 
 get isSubmitDisabled() {
-  return this.inputValueIncorrect;
+  return this.loginForm.invalid;
 }
 
 getErrors(controlName: string){
-  const control=this.invalidForm.get(controlName)
+  const control=this.loginForm.get(controlName)
   const errors=control?.errors
   this.errorMessage=[]
-  if (this.invalidForm.errors?.['atLeastOneRequired']) {
+  if (this.loginForm.errors?.['atLeastOneRequired']) {
     this.errorMessage.push(`* 請輸入用戶名稱或電子郵件`);
   }
   if(errors?.['required']){
@@ -76,34 +74,33 @@ getErrors(controlName: string){
   }
   return this.errorMessage
 }
-hasErrors(): boolean {
-  const hasFormError=this.invalidForm.touched && this.invalidForm.errors?.['atLeastOneRequired']
+hasErrors() {
+  const hasFormError=this.loginForm.touched && this.loginForm.errors?.['atLeastOneRequired']
   const hasFieldErrors=['username','email','password'].some(field=>{
-    const control = this.invalidForm.get(field)
+    const control = this.loginForm.get(field)
     return control?.touched && control?.invalid
   })
-  return hasFieldErrors || hasFormError
+  return { hasFormError, hasFieldErrors };
 }
 
 onSubmit(){
-  const formValue=this.invalidForm.value
-    //發送api
-    this.fetchAPIService.login(formValue).subscribe({
-      next:(res:HttpResponse<ApiResponse>)=>{
-        if(res.status===200){
-          this.invalidForm.patchValue({
-            username:'',
-            email:'',
-            password:''
-          })
-          //彈窗
-          alert(res.body?.message)
-        }
-      },
-      error:(err)=>{
-        alert(err.error?.message || '未知錯誤')
-      }
+  const formValue=this.loginForm.value
+    this.fetchAPIService.login(formValue).
+    pipe(
+      map((res : HttpResponse<ApiResponse>)=>{
+      if(res.status===200){
+        alert(res.body?.message)
+      }return
+    }),
+    catchError((err: HttpErrorResponse)=>{
+      alert(err.error?.message)
+      this.loginForm.patchValue({
+        password:''
+      })
+      return throwError(()=>err)
     })
+
+    ).subscribe()
 }
 
 }

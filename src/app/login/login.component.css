@@ -94,10 +94,6 @@ font-size: 13px;
   .submit-btn:disabled {
     cursor: not-allowed;
   }
-
-  .submit-btn.inputCorrect {
-    background-color: rgba(0, 123, 252, 0.4);
-  }
-.inputCorrect{
+  .inputCorrect{
   background-color: rgba(0, 123, 252, 0.4);
-}
+  }

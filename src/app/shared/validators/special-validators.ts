@@ -7,7 +7,9 @@ return (control: AbstractControl): ValidationErrors | null=>{
   const email=formGroup.get('email')?.value;
 
   if(!username&&!email){
-    return{atLeastOneRequired:true}
+    return{
+      atLeastOneRequired:true
+    }
   }
   return null
 }
@@ -23,6 +25,6 @@ export function specialCharValidator(): ValidatorFn{
     if(!hasSpecialChar||!hasUpperCAse){
       return {specialCharRequired:true}
     }
-    return null;
+    return null
   }
 }
