@@ -2,7 +2,7 @@ import { FetchAPIService } from './../services/fetch-api.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { debounceTime, map, catchError, throwError } from 'rxjs';
+import { debounceTime, map, catchError, throwError, tap } from 'rxjs';
 import { atLeastOneRequiredValidator, specialCharValidator } from '../shared/validators/special-validators';
 import { ApiResponse } from '../interfaces/employee.interface';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -20,6 +20,7 @@ export class LoginComponent {
 loginForm!: FormGroup;
 errorMessage: string[]=[]
 
+
 constructor(private formBuilder: FormBuilder, private fetchAPIService:FetchAPIService){}
 
 get loginMethod() {
@@ -27,28 +28,53 @@ get loginMethod() {
 }
 
 ngOnInit():void{
-  //valueChanges為observable可設定pipe
   this.loginForm = this.formBuilder.group({
     loginMethod: ['username'],
-    username: ['', [Validators.minLength(5), Validators.maxLength(20)]],
-    email: ['',  Validators.email],
+    username: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20)]],
+    email: ['',  Validators.required, Validators.email],
     password: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20),specialCharValidator()]]
 },{validators: [atLeastOneRequiredValidator()]}
 );
 
   this.loginForm.valueChanges.pipe(
-    debounceTime(500)
-  ).subscribe(() => {
-    if(!this.loginForm.touched){
+    debounceTime(300)
+  ).subscribe(formValue => {
+    const usernameCtrl = this.loginForm.get('username');
+    const emailCtrl = this.loginForm.get('email');
+
+    if (formValue.username && !formValue.email) {
+      emailCtrl?.clearValidators();
+      emailCtrl?.setValidators([Validators.email]);
+      emailCtrl?.updateValueAndValidity();
+    }if (!formValue.username && formValue.email) {
+      usernameCtrl?.clearValidators();
+      usernameCtrl?.setValidators([
+        Validators.minLength(5),
+        Validators.maxLength(20)
+      ]);
+      usernameCtrl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    }
+
+    if(!this.loginForm.dirty){
       this.loginForm.markAsTouched()
     }
   });
+  this.loginForm.get('loginMethod')?.valueChanges.pipe(tap(()=>{
+    ['username','email'].forEach(field => {
+      this.loginForm.get(field)?.reset();
+    })
+  })).subscribe()
 }
 
 
 get isSubmitDisabled() {
-  return this.loginForm.invalid;
+  if(this.hasErrors().hasFormError||this.hasErrors().hasFieldErrors){
+    return true
+  }
+  return false
 }
+
+
 
 getErrors(controlName: string){
   const control=this.loginForm.get(controlName)
@@ -84,7 +110,8 @@ hasErrors() {
 }
 
 onSubmit(){
-  const formValue=this.loginForm.value
+  // this.loginForm.removeControl('loginMethod');
+  const {loginMethod, ...formValue}=this.loginForm.value
     this.fetchAPIService.login(formValue).
     pipe(
       map((res : HttpResponse<ApiResponse>)=>{
@@ -93,10 +120,11 @@ onSubmit(){
       }return
     }),
     catchError((err: HttpErrorResponse)=>{
-      alert(err.error?.message)
-      this.loginForm.patchValue({
-        password:''
-      })
+      alert(err.error?.message);
+      ['username','email', 'password'].forEach(field => {
+        this.loginForm.get(field)?.reset();
+      });
+      // this.loginForm.addControl('loginMethod',new FormControl('username'))
       return throwError(()=>err)
     })
 

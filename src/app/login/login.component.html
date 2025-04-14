@@ -8,7 +8,7 @@
     <div class="input-container">
       <div class="login-toggle">
         <label class="toggle-option" [class.active]="loginMethod === 'username'">
-          <input type="radio" id="toggle-username" value="username" formControlName="loginMethod">
+          <input type="radio" id="toggle-username" value="username" formControlName="loginMethod" >
           <span>帳號登入</span>
         </label>
         <label class="toggle-option" [class.active]="loginMethod === 'email'">
@@ -26,7 +26,7 @@
       <div>
         <input placeholder="密碼" type="password" formControlName="password" class="password-input" id="password">
       </div>
-      <div *ngIf="hasErrors().hasFormError" class="alert">
+      <div *ngIf="hasErrors().hasFormError || hasErrors().hasFieldErrors" class="alert">
            <!-- 顯示表單級別的錯誤 -->
             <div *ngIf="hasErrors().hasFormError">
               <div *ngFor="let error of getErrors('form')">
@@ -43,7 +43,7 @@
             </div>
       </div>
       <!-- {{isSubmitDisabled}} -->
-      <div><button type="submit" class="submit-btn" [disabled]="isSubmitDisabled" [class.inputCorrect]="loginForm.invalid">登入</button></div>
+      <div><button type="submit" class="submit-btn" [disabled]="isSubmitDisabled" [class.inputCorrect]="isSubmitDisabled">登入</button></div>
     </div>
   </form>
 </div>
