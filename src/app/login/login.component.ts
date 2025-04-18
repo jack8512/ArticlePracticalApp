@@ -1,16 +1,18 @@
+import { AuthService } from './../services/auth.service';
 import { FetchAPIService } from './../services/fetch-api.service';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { debounceTime, map, catchError, throwError, tap } from 'rxjs';
+import { debounceTime, map, catchError, throwError, tap, distinctUntilChanged, retry } from 'rxjs';
 import { atLeastOneRequiredValidator, specialCharValidator } from '../shared/validators/special-validators';
-import { ApiResponse } from '../interfaces/employee.interface';
+import { ApiResponse } from '../interfaces/interface';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Router, RouterModule } from '@angular/router';
 
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule,CommonModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   standalone:true
@@ -18,10 +20,8 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 export class LoginComponent {
 
 loginForm!: FormGroup;
-errorMessage: string[]=[]
 
-
-constructor(private formBuilder: FormBuilder, private fetchAPIService:FetchAPIService){}
+constructor(private formBuilder: FormBuilder, private fetchAPIService:FetchAPIService, private authService: AuthService, private router: Router){}
 
 get loginMethod() {
   return this.loginForm.get('loginMethod')?.value;
@@ -35,6 +35,15 @@ ngOnInit():void{
     password: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20),specialCharValidator()]]
 },{validators: [atLeastOneRequiredValidator()]}
 );
+
+  this.loginForm.get('loginMethod')?.valueChanges.subscribe(()=>{
+    ['username','email'].forEach(field => {
+      const control=this.loginForm.get(field);
+      control?.setValue('');
+      control?.markAsPristine();
+      control?.markAsUntouched();
+    })
+  })
 
   this.loginForm.valueChanges.pipe(
     debounceTime(300)
@@ -52,54 +61,47 @@ ngOnInit():void{
         Validators.minLength(5),
         Validators.maxLength(20)
       ]);
-      usernameCtrl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      usernameCtrl?.updateValueAndValidity();
     }
 
-    if(!this.loginForm.dirty){
+    if(!this.loginForm.touched){
       this.loginForm.markAsTouched()
     }
   });
-  this.loginForm.get('loginMethod')?.valueChanges.pipe(tap(()=>{
-    ['username','email'].forEach(field => {
-      this.loginForm.get(field)?.reset();
-    })
-  })).subscribe()
-}
 
+}
 
 get isSubmitDisabled() {
-  if(this.hasErrors().hasFormError||this.hasErrors().hasFieldErrors){
-    return true
-  }
-  return false
+  return this.hasErrors().hasFormError||this.hasErrors().hasFieldErrors
 }
-
-
 
 getErrors(controlName: string){
   const control=this.loginForm.get(controlName)
   const errors=control?.errors
-  this.errorMessage=[]
-  if (this.loginForm.errors?.['atLeastOneRequired']) {
-    this.errorMessage.push(`* 請輸入用戶名稱或電子郵件`);
-  }
-  if(errors?.['required']){
-    this.errorMessage.push(`* ${controlName} 為必填項目`)
+  const errorMessage: string[]=[]
+  if(errors?.['required']&& !this.loginForm.errors){
+    errorMessage.push(`* ${controlName} 為必填項目`)
   }if(errors?.['minlength']){
-    this.errorMessage.push(`* ${controlName} 必須至少包含 5 個字符`)
+    errorMessage.push(`* ${controlName} 必須至少包含 5 個字符`)
   }if(errors?.['maxlength']){
-    this.errorMessage.push(`* ${controlName} 不能超過 20 個字符`)
+    errorMessage.push(`* ${controlName} 不能超過 20 個字符`)
   } if (errors?.['specialCharRequired']) {
-    this.errorMessage.push(`* ${controlName} 需包含大寫及一個以上的特殊符號`);
-  }
-  if (errors?.['atLeastOneRequired']) {
-    this.errorMessage.push(`* 請輸入用戶名稱或電子郵件`);
+    errorMessage.push(`* ${controlName} 需包含大寫及一個以上的特殊符號`);
   }
   if (errors?.['email']) {
-    this.errorMessage.push(`* 請輸入有效的電子郵件地址`);
+    errorMessage.push(`* 請輸入有效的電子郵件地址`);
   }
-  return this.errorMessage
+  return errorMessage
 }
+getFormErrors(): string[] {
+  const errors = this.loginForm.errors;
+  const errorMessage: string[] = [];
+  if (errors?.['atLeastOneRequired']) {
+    errorMessage.push(`* 請輸入用戶名稱或電子郵件`);
+  }
+  return errorMessage;
+}
+
 hasErrors() {
   const hasFormError=this.loginForm.touched && this.loginForm.errors?.['atLeastOneRequired']
   const hasFieldErrors=['username','email','password'].some(field=>{
@@ -116,8 +118,12 @@ onSubmit(){
     pipe(
       map((res : HttpResponse<ApiResponse>)=>{
       if(res.status===200){
+        const token=res.body?.token
         alert(res.body?.message)
-      }return
+        this.authService.login(token)
+        this.router.navigateByUrl('/mainpage');
+        return
+      }return  console.error('Login failed', res); //這邊要補充錯誤處理
     }),
     catchError((err: HttpErrorResponse)=>{
       alert(err.error?.message);
@@ -126,10 +132,11 @@ onSubmit(){
       });
       // this.loginForm.addControl('loginMethod',new FormControl('username'))
       return throwError(()=>err)
-    })
+    }),
+    retry(3)
 
     ).subscribe()
-}
+  }
 
 }
 

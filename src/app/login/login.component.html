@@ -29,7 +29,7 @@
       <div *ngIf="hasErrors().hasFormError || hasErrors().hasFieldErrors" class="alert">
            <!-- 顯示表單級別的錯誤 -->
             <div *ngIf="hasErrors().hasFormError">
-              <div *ngFor="let error of getErrors('form')">
+              <div *ngFor="let error of getFormErrors()">
                 {{ error }}
               </div>
             </div>
@@ -47,6 +47,7 @@
     </div>
   </form>
 </div>
+
 
 
 

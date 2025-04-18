@@ -1,4 +1,6 @@
-export interface Employee {
+import { SafeHtml } from "@angular/platform-browser";
+
+export interface User {
   last_name: string;
   phone: string;
   first_name: string;
@@ -18,6 +20,16 @@ export interface Employee {
 }
 
 export interface ApiResponse {
-  employees: Employee;
+  user: User;
   message?: any;
+  token?: any;
 }
+
+export interface Article{
+  id: number;
+  title: string;
+  author: string;
+  content: string;
+  date: Date | string;
+}
+
