@@ -4,15 +4,23 @@
       <h2>{{ article.title }}</h2>
       <hr>
       <p class="meta">👤<span>作者</span> {{ article.author }} ｜ 📅<span>日期</span> {{ article.date }} </p>
-      <br>
-      <div class="content">
-        <div [innerHTML]="article.isCollapsed ? article.previewContent : article.content"></div>
-      </div>
-      <button class="collapse-btn" (click)="toggleContent(i)">
-        {{ article?.isCollapsed ? '展開內文 ⬇️' : '收合內文 ⬆️' }}
+      <button class="edit-btn" *ngIf="article.editable && !article.isEditing" (click)="enterEdit(i)">
+        編輯 ✏️
       </button>
-    </div>
+      <br>
+      <div *ngIf="article.isEditing">
+        <textarea class="editarea" [(ngModel)]="article.editingContent" [rows]="getRowCount(article.editingContent)"></textarea>
+        <button (click)="saveSubmit(i)">💾 儲存</button>
+        <button (click)="cancelEdit(article)">❌ 取消</button>
+      </div>
+      <div *ngIf="!article.isEditing">
+        <div [class.preview-style]="article.isCollapsed" [innerHTML]="article.isCollapsed ? article.previewContent : article.content"></div>
+        <button class="collapse-btn" (click)="toggleContent(i)">
+          {{ article.isCollapsed ? '展開內文 ⬇️' : '收合內文 ⬆️' }}
+        </button>
+      </div>
+  </div>
+  <div *ngIf="articles.length===0" class="default-message">
+    <span >目前還沒有文章喔 🥲</span>
   </div>
 </div>
-
-

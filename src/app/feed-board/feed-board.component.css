@@ -24,6 +24,7 @@
   padding: 1.2rem 1.2rem 2.2rem 1.2rem;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  line-height: 1.2rem;
   position: relative;
 }
 
@@ -33,7 +34,6 @@
   bottom: 0.5rem;
   border: none;
   padding: 0.5rem 1rem;
-  cursor: pointer;
   font-size: 0.8rem;
   transition: background-color 0.2s;
 }
@@ -44,6 +44,21 @@ color: #123987;
 .meta {
   font-size: 0.8rem;
   color: #555;
+}
+
+.edit-btn{
+  position: absolute;
+  right: 0rem;
+  top: 2.6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+
+}
+
+.editarea{
+  display: flex;
+  width:100%;
+  height: auto;
 }
 
 button {
@@ -57,4 +72,17 @@ button {
 
 button:hover {
   text-decoration: underline;
+  color: #123987;
+}
+
+.preview-style{
+  color:#ccc;
+}
+
+.default-message{
+  color:gray;
+  display: flex;
+  justify-content: center;
+  line-height: 600px;
+  font-size: 1.2rem;
 }

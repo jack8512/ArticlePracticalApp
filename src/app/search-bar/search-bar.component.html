@@ -1,1 +1,13 @@
-<p>search-bar works!</p>
+<div class="search-container" #searchBox>
+  <input [(ngModel)]="keyword" type="text" placeholder="搜尋..." (input)="searchResultsCollapse=false; isCollapsed()"/>
+  <input  [(ngModel)]="keyword" class="date-input" type="date" placeholder="選擇日期" />
+  <button class="search-btn" type="submit" (click)="onSearch()">
+    🔍
+  </button>
+   <ul class="tooltip" *ngIf="fuseSearchResults.length > 0 && !searchResultsCollapse ">
+    <li *ngFor="let title of fuseSearchResults" (click)="keyword.set(title); searchResultsCollapse=true">
+    {{ title }}
+    </li>
+  </ul>
+</div>
+
