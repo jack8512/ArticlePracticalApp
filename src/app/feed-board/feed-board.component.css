@@ -86,3 +86,45 @@ button:hover {
   line-height: 600px;
   font-size: 1.2rem;
 }
+
+.btn-container {
+  position: fixed;
+  bottom: 5%;
+  right: 5%;
+  z-index: 10;
+}
+
+.create-article-btn {
+  padding: 12px 20px;
+  background-color:#007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.article-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.article-dialog {
+  padding: 2rem;
+  border: none;
+  border-radius: 10px;
+  z-index: 50;
+  max-width: 600px;
+  width: 90%;
+}
+
+.article-dialog h2{
+  font-size: 1.5rem;
+  line-height: 1.5;
+}
+.article-dialog input{
+  width: 100%;
+  font-size: 1.5rem;
+}
+.article-dialog textarea{
+  width: 100%;
+}

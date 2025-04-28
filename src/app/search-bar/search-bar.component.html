@@ -1,5 +1,5 @@
 <div class="search-container" #searchBox>
-  <input [(ngModel)]="keyword" type="text" placeholder="搜尋..." (input)="searchResultsCollapse=false; isCollapsed()"/>
+  <input [(ngModel)]="keyword" type="text" placeholder="搜尋..." (input)="searchResultsCollapse=false; isCollapsed()" (keyup.enter)="onSearch()"/>
   <input  [(ngModel)]="keyword" class="date-input" type="date" placeholder="選擇日期" />
   <button class="search-btn" type="submit" (click)="onSearch()">
     🔍

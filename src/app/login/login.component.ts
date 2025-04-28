@@ -1,5 +1,6 @@
+import { User } from './../interfaces/interface';
 import { AuthService } from './../services/auth.service';
-import { FetchAPIService } from './../services/fetch-api.service';
+import { UserService } from '../services/user.service';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -21,7 +22,7 @@ export class LoginComponent {
 
 loginForm!: FormGroup;
 
-constructor(private formBuilder: FormBuilder, private fetchAPIService:FetchAPIService, private authService: AuthService, private router: Router){}
+constructor(private formBuilder: FormBuilder, private userService:UserService, private authService: AuthService, private router: Router){}
 
 get loginMethod() {
   return this.loginForm.get('loginMethod')?.value;
@@ -114,13 +115,13 @@ hasErrors() {
 onSubmit(){
   // this.loginForm.removeControl('loginMethod');
   const {loginMethod, ...formValue}=this.loginForm.value
-    this.fetchAPIService.login(formValue).
+    this.userService.login(formValue).
     pipe(
       map((res : HttpResponse<ApiResponse>)=>{
       if(res.status===200){
         const token=res.body?.token
         alert(res.body?.message)
-        this.authService.login(token)
+        this.authService.saveToken(token)
         this.router.navigateByUrl('/mainpage');
         return
       }return  console.error('Login failed', res); //這邊要補充錯誤處理

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { User } from '../interfaces/interface';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,11 +29,17 @@ export class AuthService {
     );
   }
 
-  login(token: string) {
+  saveToken(token: string) {
     localStorage.setItem(this.tokenKey, token);
   }
+  saveUser(user:User | undefined){
+    localStorage.setItem('userInfo',JSON.stringify(user))
+  }
 
-  logout() {
+  clearToken() {
     localStorage.removeItem(this.tokenKey);
+  }
+  clearUser() {
+    localStorage.removeItem('userInfo');
   }
 }

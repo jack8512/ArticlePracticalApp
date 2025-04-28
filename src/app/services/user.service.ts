@@ -1,14 +1,15 @@
+import { HttpHeaders,HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../interfaces/interface';
+import { ApiResponse, User } from '../interfaces/interface';
 import { HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FetchAPIService {
+export class UserService {
+
   private url=`${environment.baseUrl}`
   constructor(private http: HttpClient){}
 
@@ -17,9 +18,9 @@ export class FetchAPIService {
       observe:'response'
     })
   }
-  getUser(): Observable<HttpResponse<ApiResponse>> {
-    return this.http.get<ApiResponse>(`${this.url}`,{
-      observe:'response'
-    })
+
+  getUser(token: any): Observable<HttpResponse<User>> {
+    const headers = new HttpHeaders().set('Authorization', token);
+    return this.http.get<User>(`${this.url}/users/profile`,{headers,observe: 'response'})
   }
 }

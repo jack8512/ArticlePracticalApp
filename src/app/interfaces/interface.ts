@@ -1,5 +1,3 @@
-import { SafeHtml } from "@angular/platform-browser";
-
 export interface User {
   last_name: string;
   phone: string;
@@ -17,19 +15,22 @@ export interface User {
   updated_at: string;
   username: string;
   password: string;
+  token?:string
 }
 
 export interface ApiResponse {
-  user: User;
   message?: any;
+  status?:boolean;
   token?: any;
+  data?: any
 }
 
 export interface Article{
-  id: number;
+  _id?: string;
   title: string;
   author: string;
   content: string;
   date: Date | string;
+  userId?: string | null;
 }
 

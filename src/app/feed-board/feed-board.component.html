@@ -24,3 +24,20 @@
     <span >目前還沒有文章喔 🥲</span>
   </div>
 </div>
+
+
+<!-- 彈窗 Dialog -->
+<dialog class="article-dialog" #articleDialog>
+  <form method="dialog" class="article-card">
+    <h2>標題:<input [(ngModel)]="newArticleData.title" name="title"></h2>
+    <hr>
+    <p>內文:<textarea [(ngModel)]="newArticleData.content" name="content" rows="20"></textarea></p>
+    <button (click)="submitNewArticle()">✅ 發佈</button>
+    <button (click)="closeDialog()">❌ 關閉</button>
+  </form>
+</dialog>
+
+<div class="btn-container">
+  <button class="create-article-btn" (click)="openDialog()">新增文章</button>
+</div>
+

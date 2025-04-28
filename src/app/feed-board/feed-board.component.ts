@@ -1,9 +1,9 @@
-import { HttpResponse } from '@angular/common/http';
+import { UserService } from './../services/user.service';
 import { ArticleService } from './../services/article.service';
-import { ApiResponse, Article } from './../interfaces/interface';
-import { Component } from '@angular/core';
+import { ApiResponse, Article, User } from './../interfaces/interface';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { filter, map, tap } from 'rxjs';
+import { filter, map, tap, forkJoin } from 'rxjs';
 import {marked, Renderer} from 'marked'
 import DOMPurify from 'dompurify'
 import { DomSanitizer } from '@angular/platform-browser';
@@ -42,37 +42,90 @@ type SanitizedArticle = Omit<Article, 'content'> & {
 })
 export class FeedBoardComponent {
 
-  constructor(private articleService: ArticleService, private sanitizer: DomSanitizer){}
+  constructor(private articleService: ArticleService, private sanitizer: DomSanitizer, private userService: UserService){}
 
   articles: SanitizedArticle[] = [];
   allArticles: SanitizedArticle[] = [];
+  user:User | null=null
+
+
+  @ViewChild('articleDialog') articleDialog!: ElementRef<HTMLDialogElement>
+  newArticleData = {
+    title: '',
+    author: '',
+    content: '',
+    date: new Date(),
+    userId: ''
+  };
+
+  openDialog(){
+    this.newArticleData={
+    title:'',
+    author:`${this.user?.first_name} ${this.user?.last_name}`,
+    content:'',
+    date:new Date,
+    userId:String(this.user?.id|| null)
+    }
+    this.articleDialog.nativeElement.showModal()
+    console.log(this.newArticleData);
+
+  }
+
+  closeDialog(){
+    this.articleDialog.nativeElement.close()
+  }
+  submitNewArticle() {
+    console.log(this.newArticleData);
+    this.articleService.postArticle(this.newArticleData).pipe(
+      tap((res)=>{if(res.status==201){
+        alert('新增成功')
+        this.ngOnInit()
+      }else{
+        alert('新增失敗')
+      }})
+    ).subscribe()
+    this.closeDialog();
+  }
 
   ngOnInit() {
-    this.articleService.getArticles().pipe(
-      map((res: HttpResponse<Article[]>) => {
-        const articles = res.body ?? [];
-        return articles.map(article => {
-        return {
-           ...article,
-          content: this.toSafeHtml(article.content),
-          previewContent: this.toSafeHtml(article.content, 100),
-          rawContent:article.content,
-          editable: true,
-          isCollapsed: true,
-          isEditing: false
-        }
+    const token = this.articleService.getToken();
+    forkJoin({
+      userRes: this.userService.getUser(token),
+      articleRes: this.articleService.getArticles()
+    }).pipe(
+      map(({ userRes, articleRes }) => {
+        const user = userRes.body;
+        const userId = user?.id;
+        const articles = articleRes.body ?? [];
+
+        const transformed = articles.map(article => {
+          const content = article.content;
+          return {
+            ...article,
+            content: this.toSafeHtml(content),
+            date: String(article.date).split('T')[0],
+            previewContent: this.toSafeHtml(content, 100),
+            rawContent: content,
+            editable: article.userId === userId,
+            isCollapsed: true,
+            isEditing: false
+          };
         });
+
+        return { user, transformed };
       })
     ).subscribe({
-      next: (articles) => {
-        this.articles = articles;
-        this.allArticles=[...articles]
+      next: ({ user, transformed }) => {
+        this.user = user;
+        this.articles = transformed;
+        this.allArticles = structuredClone(transformed);
       },
       error: (err) => {
-        console.error('API 錯誤：', err);
+        console.error('初始化失敗：', err);
       }
     });
   }
+
 
   highlightCode() {
     setTimeout(() => {
@@ -106,12 +159,26 @@ export class FeedBoardComponent {
   cancelEdit(article: SanitizedArticle) {
     article.editingContent = article.rawContent;
     article.isEditing = false;
-    article.isCollapsed = true;
+    article.isCollapsed = false;
   }
 
   saveSubmit(index: number){
-    console.log(this.articles[index].editingContent);
-
+    if(confirm('確定送出嗎？')){
+      const updateArticle={
+        ...this.articles[index],
+        "content": this.articles[index].editingContent|| '',
+        "date": new Date().toISOString().split('T')[0]
+      }
+      // console.log('更新文章',updateArticle);
+      this.articleService.updateArticle(updateArticle).pipe(
+        tap((res)=>{
+          if(res.status===201){alert('更新成功');
+            this.ngOnInit()
+          }
+          else{alert('更新失敗')}
+        })
+      ).subscribe()
+    }
   }
   //搜尋欄查詢
   searchKeyword(keyword: string): void{
