@@ -1,6 +1,6 @@
-import { UserService } from './../services/user.service';
-import { ArticleService } from './../services/article.service';
-import { ApiResponse, Article, User } from './../interfaces/interface';
+import { UserService } from '../services/user.service';
+import { ArticleService } from '../services/article.service';
+import { ApiResponse, Article, User } from '../interfaces/interface';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { filter, map, tap, forkJoin } from 'rxjs';
@@ -67,15 +67,14 @@ export class FeedBoardComponent {
     userId:String(this.user?.id|| null)
     }
     this.articleDialog.nativeElement.showModal()
-    console.log(this.newArticleData);
-
+    // console.log(this.newArticleData);
   }
 
   closeDialog(){
     this.articleDialog.nativeElement.close()
   }
   submitNewArticle() {
-    console.log(this.newArticleData);
+    // console.log(this.newArticleData);
     this.articleService.postArticle(this.newArticleData).pipe(
       tap((res)=>{if(res.status==201){
         alert('新增成功')
@@ -148,7 +147,7 @@ export class FeedBoardComponent {
 
   getRowCount(content: any): number {
     const lineCount = content.length/50;
-    return Math.max(10, lineCount);
+    return Math.max(20, lineCount);
   }
 
   enterEdit(index: number) {
@@ -180,7 +179,7 @@ export class FeedBoardComponent {
       ).subscribe()
     }
   }
-  //搜尋欄查詢
+
   searchKeyword(keyword: string): void{
     if(!keyword || keyword.trim()===''){
       this.articles=[...this.allArticles]

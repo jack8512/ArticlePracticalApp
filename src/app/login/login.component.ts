@@ -1,5 +1,4 @@
-import { User } from './../interfaces/interface';
-import { AuthService } from './../services/auth.service';
+import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';

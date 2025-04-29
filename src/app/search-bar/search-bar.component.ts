@@ -1,4 +1,4 @@
-import { Article } from './../interfaces/interface';
+import { Article } from '../interfaces/interface';
 import { Component, signal, model, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -26,7 +26,6 @@ articles: Article[] = [];
 fuseSearchResults:string[]=[]
 searchResultsCollapse=false
 
-
 ngOnInit(): void {
   this.articleService.getArticles().pipe(
     map((res) => res.body ?? [])
@@ -48,8 +47,8 @@ ngOnInit(): void {
   )
   .subscribe((results) => {this.fuseSearchResults = results}
   );
-
 }
+
 onSearch(){
 this.processFilter.emit(this.keyword())
 }
