@@ -8,11 +8,12 @@ import { atLeastOneRequiredValidator, specialCharValidator } from '../shared/val
 import { ApiResponse } from '../interfaces/interface';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
+import { HeaderComponent } from '../header/header.component';
 
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule,CommonModule, RouterModule],
+  imports: [ReactiveFormsModule,CommonModule, RouterModule, HeaderComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   standalone:true

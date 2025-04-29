@@ -87,9 +87,8 @@ export class FeedBoardComponent {
   }
 
   ngOnInit() {
-    const token = this.articleService.getToken();
     forkJoin({
-      userRes: this.userService.getUser(token),
+      userRes: this.userService.getUser(),
       articleRes: this.articleService.getArticles()
     }).pipe(
       map(({ userRes, articleRes }) => {

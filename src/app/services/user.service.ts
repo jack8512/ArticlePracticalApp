@@ -13,14 +13,20 @@ export class UserService {
   private url=`${environment.baseUrl}`
   constructor(private http: HttpClient){}
 
+  private tokenKey='Authorization'
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
   login(payload: any): Observable<HttpResponse<ApiResponse>>{
     return this.http.post<ApiResponse>(`${this.url}/users/login`,payload,{
       observe:'response'
     })
   }
 
-  getUser(token: any): Observable<HttpResponse<User>> {
-    const headers = new HttpHeaders().set('Authorization', token);
+  getUser(): Observable<HttpResponse<User>> {
+    const token=this.getToken()
+    const headers = new HttpHeaders().set('Authorization', token!);
     return this.http.get<User>(`${this.url}/users/profile`,{headers,observe: 'response'})
   }
 }

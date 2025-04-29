@@ -5,7 +5,12 @@
       <li><a routerLink="/mainpage">首頁</a></li>
       <li><a routerLink="/mainpage">文章</a></li>
       <li><a routerLink="/about">關於我們</a></li>
-      <li><a routerLink="/login">登入</a></li>
+      <li *ngIf="isLoggedIn"><span>Hi {{userName}}</span></li>
+      <li>
+        <a routerLink="/login" (click)="isLoggedIn ? logout() : null">
+          {{ isLoggedIn ? '登出' : '登入' }}
+        </a>
+      </li>
     </ul>
   </div>
 </nav>
