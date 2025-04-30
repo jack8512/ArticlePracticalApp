@@ -5,12 +5,29 @@
       <li><a routerLink="/mainpage">首頁</a></li>
       <li><a routerLink="/mainpage">文章</a></li>
       <li><a routerLink="/about">關於我們</a></li>
-      <li *ngIf="isLoggedIn"><span>Hi {{userName}}</span></li>
-      <li>
+      <!-- <li *ngIf="isLoggedIn$ | async as isLoggedIn"><span>Hi {{userName}}</span></li>
+      <li *ngIf="isLoggedIn$ | async as isLoggedIn">
         <a routerLink="/login" (click)="isLoggedIn ? logout() : null">
           {{ isLoggedIn ? '登出' : '登入' }}
         </a>
-      </li>
+      </li> -->
+      <ng-container *ngIf="isLoggedIn$ | async as isLoggedIn; else login">
+        <li *ngIf="isLoggedIn">
+          <span>Hi {{ userName }}</span>
+        </li>
+        <li>
+          <a routerLink="/login" (click)="logout()">
+            登出
+          </a>
+        </li>
+      </ng-container>
+
+      <ng-template #login>
+        <li>
+          <a routerLink="/login">登入</a>
+        </li>
+      </ng-template>
+
     </ul>
   </div>
 </nav>
