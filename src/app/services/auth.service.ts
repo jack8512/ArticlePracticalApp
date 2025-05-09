@@ -1,7 +1,8 @@
+import { UserService } from './user.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, concatMap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User } from '../interfaces/interface';
 
@@ -9,22 +10,22 @@ import { User } from '../interfaces/interface';
 export class AuthService {
   private url=`${environment.baseUrl}`
   private tokenKey='Authorization'
-  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
-  isLoggedIn$ = this.isLoggedInSubject.asObservable();
+  isLoggedIn$ = new BehaviorSubject<boolean>(false);
+  user = new BehaviorSubject<User|null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private userService:UserService) {}
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
   checkLoginStatus(): void {
-    this.isLoggedIn().subscribe((status)=>this.isLoggedInSubject.next(status))
+    this.isLoggedIn().subscribe((status)=>this.isLoggedIn$.next(status))
   }
   logout(){
     this.clearToken()
     this.clearUser()
-    this.isLoggedInSubject.next(false)
+    this.isLoggedIn$.next(false)
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -33,11 +34,11 @@ export class AuthService {
     const headers = new HttpHeaders().set(this.tokenKey, token);
     return this.http.get(`${this.url}/users/auth`, { headers }).pipe(
       map(() =>{
-        this.isLoggedInSubject.next(true);
+        this.isLoggedIn$.next(true);
         return true
       }),
       catchError(() => {
-        this.isLoggedInSubject.next(false)
+        this.isLoggedIn$.next(false)
         return  of(false)})
     );
   }
@@ -55,4 +56,9 @@ export class AuthService {
   clearUser() {
     localStorage.removeItem('userInfo');
   }
+
+  // auth(payload) {
+  //   this.userService.login(payload)
+  //       .pipe(concatMap((user) => this.user.next(user))).subscribe()
+  // }
 }
