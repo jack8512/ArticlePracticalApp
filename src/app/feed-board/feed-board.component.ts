@@ -1,4 +1,4 @@
-import { UserService } from '../services/user.service';
+import { UserStore } from './../services/user-store.service';
 import { ArticleService } from '../services/article.service';
 import { ApiResponse, Article, User } from '../interfaces/interface';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { filter, map, tap, forkJoin } from 'rxjs';
 import {marked, Renderer} from 'marked'
 import DOMPurify from 'dompurify'
-import { DomSanitizer } from '@angular/platform-browser';
 import { SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import Fuse from 'fuse.js';
@@ -42,7 +41,7 @@ type SanitizedArticle = Omit<Article, 'content'> & {
 })
 export class FeedBoardComponent {
 
-  constructor(private articleService: ArticleService, private sanitizer: DomSanitizer, private userService: UserService){}
+  constructor(private articleService: ArticleService,  private userStore:UserStore){}
 
   articles: SanitizedArticle[] = [];
   allArticles: SanitizedArticle[] = [];
@@ -64,7 +63,7 @@ export class FeedBoardComponent {
     author:`${this.user?.first_name} ${this.user?.last_name}`,
     content:'',
     date:new Date,
-    userId:String(this.user?.id|| null)
+    userId:String(this.user?.id)
     }
     this.articleDialog.nativeElement.showModal()
     // console.log(this.newArticleData);
@@ -88,11 +87,11 @@ export class FeedBoardComponent {
 
   ngOnInit() {
     forkJoin({
-      userRes: this.userService.getUser(),
+      userRes: this.userStore.getUser(),
       articleRes: this.articleService.getArticles()
     }).pipe(
       map(({ userRes, articleRes }) => {
-        const user = userRes.body;
+        const user = userRes;
         const userId = user?.id;
         const articles = articleRes.body ?? [];
 

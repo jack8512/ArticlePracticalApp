@@ -4,6 +4,9 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { ApiResponse, User } from '../interfaces/interface';
 import { HttpResponse } from '@angular/common/http';
+import { UserStore } from './user-store.service';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,7 @@ import { HttpResponse } from '@angular/common/http';
 export class UserService {
 
   private url=`${environment.baseUrl}`
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient, private userStore: UserStore){}
 
   private tokenKey='Authorization'
   getToken(): string | null {
@@ -29,4 +32,5 @@ export class UserService {
     const headers = new HttpHeaders().set('Authorization', token!);
     return this.http.get<User>(`${this.url}/users/profile`,{headers,observe: 'response'})
   }
+
 }
